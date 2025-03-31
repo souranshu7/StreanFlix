@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Payment - StreamFlix</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a202c;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .container p {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            outline: none;
+            background-color: #4a5568;
+            color: #fff;
+        }
+        .container button {
+            background-color: #3182ce;
+            color: #fff;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .container button:hover {
+            background-color: #2b6cb0;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold mb-4">Credit Card Payment</h1>
+        <p class="text-xl mb-8">You have selected the <span id="plan-name"></span> plan.</p>
+        <p class="text-xl mb-8">Amount to pay: ₹<span id="plan-price"></span>/month</p>
+        <div class="mb-8">
+            <input type="text" placeholder="Card Number" class="bg-gray-700 p-2 rounded mb-4 w-full" />
+            <input type="text" placeholder="CVV" class="bg-gray-700 p-2 rounded mb-4 w-full" />
+            <input type="text" placeholder="Name on Card" class="bg-gray-700 p-2 rounded mb-4 w-full" />
+            <input type="text" placeholder="Expiry Date (MM/YY)" class="bg-gray-700 p-2 rounded mb-4 w-full" />
+        </div>
+        <button id="pay-button" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">Pay Now</button>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const planName = urlParams.get('plan');
+        const planPrice = urlParams.get('price');
+
+        // Set plan details in the page
+        document.getElementById('plan-name').textContent = planName;
+        document.getElementById('plan-price').textContent = planPrice;
+
+        document.getElementById('pay-button').addEventListener('click', () => {
+            fetch('http://localhost:3001/paytm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount: planPrice, email: 'user@example.com' }) // Replace with actual email
+            })
+            .then(response => response.json())
+            .then(data => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://securegw-stage.paytm.in/theia/processTransaction'; // For testing, use 'securegw-stage.paytm.in'
+
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = key;
+                        hiddenField.value = data[key];
+                        form.appendChild(hiddenField);
+                    }
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

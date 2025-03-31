@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - StreamFlix</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #141414;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .plan-details, .payment-selection {
+            flex: 1;
+            padding: 1rem;
+        }
+        .plan-details {
+            border-right: 1px solid #4a5568;
+        }
+        .plan-details h1, .payment-selection h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .plan-details p, .payment-selection p {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .plan-details ul {
+            list-style: none;
+            padding: 0;
+        }
+        .plan-details li {
+            margin-bottom: 0.5rem;
+        }
+        .plan-details li::before {
+            content: '✔';
+            color: #4caf50;
+            margin-right: 0.5rem;
+        }
+        .payment-selection select, .payment-selection button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            outline: none;
+        }
+        .payment-selection select {
+            background-color: #4a5568;
+            color: #fff;
+        }
+        .payment-selection button {
+            background-color: #e50914;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .payment-selection button:hover {
+            background-color: #b81d24;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="plan-details">
+            <h1 class="text-4xl font-bold mb-4">Selected Plan</h1>
+            <p class="text-xl mb-8">You have selected the <span id="plan-name"></span> plan.</p>
+            <p class="text-xl mb-8">Amount to pay: ₹<span id="plan-price"></span>/month</p>
+            <h2 class="text-2xl font-bold mb-4">Benefits</h2>
+            <ul id="plan-benefits">
+                <!-- Benefits will be populated here -->
+            </ul>
+        </div>
+        <div class="payment-selection">
+            <h1 class="text-4xl font-bold mb-4">Payment</h1>
+            <div class="mb-8">
+                <label for="payment-method" class="block mb-2">Select Payment Method:</label>
+                <select id="payment-method" class="bg-gray-700 p-2 rounded">
+                    <option value="credit-card">Credit Card</option>
+                    <option value="upi">UPI</option>
+                </select>
+            </div>
+            <button id="proceed-button" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Proceed to Pay</button>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const planName = urlParams.get('plan');
+        const planPrice = urlParams.get('price');
+
+        // Set plan details in the page
+        document.getElementById('plan-name').textContent = planName;
+        document.getElementById('plan-price').textContent = planPrice;
+
+        // Define plan benefits
+        const planBenefits = {
+            'Basic': ['HD Streaming', '1 Device', 'Limited Content'],
+            'Standard': ['Full HD Streaming', '2 Devices', 'Full Library Access'],
+            'Premium': ['4K Ultra HD', '4 Devices', 'Full Library + Exclusive Content']
+        };
+
+        // Populate plan benefits
+        const benefitsList = document.getElementById('plan-benefits');
+        planBenefits[planName].forEach(benefit => {
+            const li = document.createElement('li');
+            li.textContent = benefit;
+            benefitsList.appendChild(li);
+        });
+
+        // Handle proceed button click
+        document.getElementById('proceed-button').addEventListener('click', () => {
+            const paymentMethod = document.getElementById('payment-method').value;
+            if (paymentMethod === 'credit-card') {
+                window.location.href = `/credit-card.html?plan=${encodeURIComponent(planName)}&price=${planPrice}`;
+            } else if (paymentMethod === 'upi') {
+                window.location.href = `/upi.html?plan=${encodeURIComponent(planName)}&price=${planPrice}`;
+            }
+        });
+    </script>
+</body>
+</html>
